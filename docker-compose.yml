@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: melscube
+      POSTGRES_USER: mels
+      POSTGRES_PASSWORD: changeme
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://mels:changeme@db:5432/melscube
+      BOT_TOKEN: ${BOT_TOKEN:-changeme}
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    command: ["python", "main.py"]
+
+volumes:
+  db_data:
